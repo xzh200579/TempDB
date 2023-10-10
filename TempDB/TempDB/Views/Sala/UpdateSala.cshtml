@@ -1,0 +1,243 @@
+﻿@{
+    Layout = null;
+}
+@using Model;
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="../../css/table.css" type="text/css" />
+    <script type="text/javascript" src="../../javascript/comm/comm.js"></script>
+    <script type="text/javascript" src="../../javascript/jquery-1.7.2.js"></script>
+    <script src="~/Scripts/vue/dist/vue.js"></script>
+    <script src="~/Scripts/element-ui/lib/index.js"></script>
+    <link href="~/Scripts/element-ui/lib/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/axios/dist/axios.js"></script>
+
+    <style type="text/css">
+        /*.el-table tr {
+            background-color: #FFFFCC;
+        }*/
+    </style>
+    <title>无标题文档</title>
+</head>
+<body>
+    <div id="app">
+        @{ Salary_standard salary = ViewBag.s;}
+        <form method="post" action="" v-on:submit="ti()">
+            <table width="100%">
+                <tr>
+                    <td>
+                        <font color="black">
+                            您正在做的业务是：人力资源--薪酬标准管理--薪酬标准登记复核
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">
+                        <input type="submit" value="复核通过" class="BUTTON_STYLE1" style="width: 65px; height: 30px; border-radius: 5px">
+                        <input type="reset" value="返 回" class="BUTTON_STYLE1" style="width: 65px; height: 30px; border-radius: 5px" onclick="javascript:window.location='/Sala/Index';">
+                    </td>
+                </tr>
+            </table>
+            <table id="stable" width="90%" border="1" cellpadding=0 cellspacing=1
+                   bordercolorlight=#848284 bordercolordark=#eeeeee
+                   class="TABLE_STYLE1">
+                <tr>
+                    <td width="74" class="TD_STYLE1">
+                        薪酬标准编号
+                    </td>
+                    <td width="168" class="TD_STYLE2">
+                        <input type="text" name="standard.standardId" v-model="XCnumbering" readonly="readonly" class="INPUT_STYLE2">
+                    </td>
+                    <td width="83" class="TD_STYLE1">
+                        薪酬标准名称
+                    </td>
+                    <td width="171" class="TD_STYLE2">
+                        <input type="text" name="standard.standardName" v-model="xName" id="standardName" class="INPUT_STYLE2">
+                    </td>
+                    <td width="170" class="TD_STYLE1">
+                        薪酬总额
+                    </td>
+                    <td width="138" class="TD_STYLE2">
+                        <input type="text" name="standard.salarySum" id="sumSalary" v-model="TotalAmount" readonly class="INPUT_STYLE2" />
+                    </td>
+                    <td width="103" class="TD_STYLE1">
+                        &nbsp;
+                    </td>
+                    <td width="95" height="26" class="TD_STYLE2">
+                        &nbsp;
+                    </td>
+                </tr>
+                <tr>
+                    <td class="TD_STYLE1">
+                        制定人
+                    </td>
+                    <td class="TD_STYLE2">
+                        <el-select v-model="Enacters" placeholder="请选择制定人">
+                            <el-option v-for="item in user" :label="item.u_true_name" :value="item.u_true_name"></el-option>
+                        </el-select>
+                    </td>
+                    <td class="TD_STYLE1">
+                        复核人
+                    </td>
+                    <td class="TD_STYLE2">
+                        <el-select v-model="Registrant" placeholder="请选择复核人">
+                            <el-option v-for="item in user" :label="item.u_true_name" :value="item.u_true_name"></el-option>
+                        </el-select>
+                    </td>
+
+                    <td class="TD_STYLE1">
+                        复核时间
+                    </td>
+                    <td class="TD_STYLE2">
+                        <input type="text" id="Tdate" v-model="datetime" name="standard.check_time" class="INPUT_STYLE2">
+                    </td>
+                    <td class="TD_STYLE1">
+                        &nbsp;
+                    </td>
+                    <td class="TD_STYLE2">
+                        &nbsp;
+                    </td>
+                </tr>
+                <tr>
+                    <td class="TD_STYLE1">
+                       复核意见
+                    </td>
+                    <td colspan="7" class="TD_STYLE2">
+                        <textarea name="standard.check_comment" rows="4" class="TEXTAREA_STYLE1" v-model="opinion"></textarea>
+                    </td>
+                </tr>
+            </table>
+            <el-table :data="tableData"
+                      height="400"
+                      border
+                      style="width: 100%"
+                      :header-cell-style="{color: '#000000', fontSize: '18px', height:'64px',  background: '#C3DAF5'}">
+                >
+                <el-table-column prop="item_id"
+                                 label="序号"
+                                 width="500">
+                </el-table-column>
+                <el-table-column prop="item_name"
+                                 label="薪酬项目名称"
+                                 width="680">
+                </el-table-column>
+                <el-table-column label="金额" width="510">
+                    <template slot-scope="scope">
+                        <el-input type="text" v-model="scope.row.salary" v-on:input="updateTotalSalary"></el-input>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <p>
+                &nbsp;
+            </p>
+        </form>
+    </div>
+    <script type="text/javascript">
+        var vm = new Vue({
+            el: "#app",
+            data() {
+                return {
+                    tableData: [],//存储薪酬信息
+                    inputValue: "",
+                    TotalAmount: 0.00,//总金额
+                    XCnumbering: "",//薪酬随机编号
+                    datetime: "",//显示现在时间
+                    Enacters: "",//制定人
+                    xName: "",//薪酬名称
+                    rowInputData: [],//进程存储每列金额
+                    mname: "",//名称
+                    Status: '是',
+                    ChangeStatus:"2",
+                    Registrant: "",//复核人
+                    opinion:"",//复核意见
+                }
+            },
+            methods: {
+                UName() {
+                    axios.get("/Users/UserYH")
+                        .then(res => {
+                            this.user = res.data;
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        })
+                },
+                fill() {
+                    this.XCnumbering = @Html.Raw(Json.Encode(salary.standard_id));
+                    this.xName       = @Html.Raw(Json.Encode(salary.standard_name));
+                    this.TotalAmount = @Html.Raw(Json.Encode(salary.salary_sum));
+                    this.Enacters = @Html.Raw(Json.Encode(salary.designer));
+                    this.Registrant=@Html.Raw(Json.Encode(salary.checker));
+                },
+                fillTwo() {
+                    axios.get("/SalaDetails/FuX?id=" + this.XCnumbering)
+                        .then(res => {
+                            console.log(res.data);
+                            this.tableData = res.data;
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        })
+                },
+                //计算金额
+                updateTotalSalary() {
+                    this.TotalAmount = this.tableData.reduce((total, item) => total + parseFloat(item.salary || 0), 0);
+                },
+                //进行计算当前时间
+                updateCurrentTime() {
+                    const currentTime = new Date();
+                    const formattedTime = `${currentTime.getFullYear()}-${(currentTime.getMonth() + 1).toString().padStart(2, '0')}-${currentTime.getDate().toString().padStart(2, '0')} ${currentTime.getHours().toString().padStart(2, '0')}:${currentTime.getMinutes().toString().padStart(2, '0')}:${currentTime.getSeconds().toString().padStart(2, '0')}`;
+                    this.datetime = formattedTime;
+                },
+                //进行提交
+                ti() {
+                    let rowData = "";
+                    let name = "";
+                    for (let i = 0; i < this.tableData.length; i++) {
+                        const row = this.tableData[i];
+                        rowData += row.sdt_id + ",";
+                        name += row.salary + ",";
+                    }
+                    //清除最后一个,号
+                    rowData = rowData.slice(0, -1);
+                    name = name.slice(0, -1);
+                    //进行修改数据传递
+                    axios.get("/Sala/UpdateSX", {
+                        params: {
+                            id: rowData,
+                            TotalAmount: name,
+                            standard_id: this.XCnumbering,
+                            standard_name: this.xName,
+                            salary_sum: this.TotalAmount,
+                            designer: this.Enacters,
+                            checker: this.Registrant,
+                            check_time: this.datetime,
+                            check_status: this.Status,
+                            change_status: this.ChangeStatus,
+                            check_comment: this.opinion
+                        }
+                    }).then(res => {
+                        if (res.data == "1") {
+                            alert("修改成功!");
+                            location.href = "/Sala/UpdateSuree";
+                        } else {
+                            alert(res.data);
+                            alert("修改失败!");
+                            return;
+                        }
+                    }).catch(err => {
+                        console.log(err);
+                    })
+                }
+            },
+            mounted: function () {
+                this.fill();
+                this.UName();
+                this.fillTwo();
+                setInterval(this.updateCurrentTime, 1000);
+            }
+        });
+    </script>
+</body>
+</html>

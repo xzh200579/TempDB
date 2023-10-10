@@ -1,0 +1,134 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="../../css/table.css" type="text/css" />
+    <script type="text/javascript" src="../../javascript/jquery-1.7.2.js"></script>
+    <link href="~/Scripts/element-ui/lib/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/axios/dist/axios.js"></script>
+    <script type="text/javascript" src="../../javascript/comm/comm.js"></script>
+    <script src="~/Scripts/vue/dist/vue.js"></script>
+    <script src="~/Scripts/element-ui/lib/index.js"></script>
+
+</head>
+<body>
+    <div id="app">
+            <table width="100%">
+                <tr>
+                    <td>
+                        <font color="black">您正在做的业务是:人力资源管理--薪酬标准管理--薪酬标准登记复核</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        &nbsp;
+                    </td>
+                </tr>
+            </table>
+            <el-table :data="tableData"
+                      border
+                      style="width: 100%">
+                <el-table-column prop="standard_id"
+                                 label="薪酬标准编号"
+                                 width="300px">
+                </el-table-column>
+                <el-table-column prop="standard_name"
+                                 label="薪酬标准名称"
+                                 width="300px">
+                </el-table-column>
+                <el-table-column prop="designer"
+                                 label="制定人"
+                                 width="280px">
+                </el-table-column>
+                <el-table-column prop="regist_time"
+                                 label="登记时间"
+                                 width="280px">
+                    <template slot-scope="scope">
+                        {{ scope.row.regist_time | ftime }}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="salary_sum"
+                                 label="薪酬总额"
+                                 width="180px">
+                </el-table-column>
+                <el-table-column label="复核">
+                    <template slot-scope="scope">
+                        <el-button size="mini" type="primary"
+                                   style="width:70px;height:40px;"
+                                   v-on:click="handleEdit(scope.row.standard_id)">复核</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div align="center" style="font-size: 18px; color: gray; margin-top: 10px;" id="borther">
+                <el-pagination v-on:size-change="handleSizeChange"
+                               v-on:current-change="handleCurrentChange"
+                               :currentpage="currentPage"
+                               :page-sizes="[4, 8, 12, 16]"
+                               :page-size="pageSize"
+                               layout="total, sizes, prev, pager, next, jumper"
+                               :total="rows">
+                </el-pagination>
+                @*<input type="image" onclick="dopagebybutton()" src="~/images/go.bmp" width="20" height="20" border="0">*@
+                @*<input type="hidden" name="page.startPage" id="startpage" value="1">*@
+            </div>
+    </div>
+    <script type="text/javascript">
+        var splicing = "check_status='否'";
+        var vm = new Vue({
+            el: "#app",
+            data: {
+                tableData: [],//进行存储数据
+                currentPage: 1,
+                pageSize: 4,
+                rows: 1,
+            },
+            methods: {
+                fill: function () {
+                    var t = this;
+                    axios.get('/Sala/IndexSala', {
+                        params: {
+                            CurrentPage: t.currentPage,
+                            PageSize: t.pageSize,
+                            Condition: splicing
+                        }
+                    }).then(res => {
+                        t.tableData = res.data.List;
+                        t.rows = res.data.Rows;
+                        console.log(res)
+                    }).catch(err => {
+                        console.log(err);
+                    })
+                }, handleSizeChange: function (size) {
+                    this.pageSize = size;
+                    this.currentPage = 1;
+                    this.fill();
+                },
+                handleCurrentChange: function (cpage) {
+                    this.currentPage = cpage;
+                    this.fill();
+                }, handleEdit(row) {
+                    location.href = "/Sala/UpdateSala?id=" + row;
+                },
+            },
+            mounted: function () {
+                this.fill();
+            },
+            filters: {
+                ftime: function (value, spe) {
+                    if (value == '/Date(-62135596800000)/') {
+                        return '空'
+                    }
+                    var dt = new Date(parseInt(value.replace("/Date(", "").replace(")/", ""), 10));
+                    return dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate() + " " + dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+                }
+            }
+        })
+    </script>
+</body>
+</html>

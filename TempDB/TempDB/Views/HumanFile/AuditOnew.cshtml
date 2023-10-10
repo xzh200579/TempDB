@@ -1,0 +1,123 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="../../css/table.css" type="text/css">
+
+    <script src="~/Scripts/vue/dist/vue.js"></script>
+    <script src="~/Scripts/element-ui/lib/index.js"></script>
+    <link href="~/Scripts/element-ui/lib/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/axios/dist/axios.js"></script>
+</head>
+<body>
+    <div id="app">
+        <form method="post" action="check_list.html">
+            <table width="100%">
+                <tbody>
+                    <tr>
+                        <td>
+                            <font color="black">您正在做的业务是：人力资源--调动管理--调动审核列表</font>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <el-table :data="tableData"
+                      border
+                      style="width: 100%"
+                      >
+                <el-table-column prop="first_kind_name"
+                                 label="I级机构"
+                                 width="300">
+                </el-table-column>
+                <el-table-column prop="second_kind_name"
+                                 label="II级机构"
+                                 width="300">
+                </el-table-column>
+                <el-table-column prop="third_kind_name"
+                                 label="Ⅲ级机构"
+                                 width="300">
+                </el-table-column>
+                <el-table-column prop="salary_standard_name"
+                                 label="薪酬标准"
+                                 width="300">
+                </el-table-column>
+                <el-table-column prop="human_name"
+                                 label="名字"
+                                 width="250">
+                </el-table-column>
+                <el-table-column label="审核">
+                    <template slot-scope="scope">
+                        <el-button size="mini" type="danger" style="width:70px;height:40px"
+                                   v-on:click="handleDelete(scope.row)">审核</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <p></p>
+            <div id="fye" style=" width: 450px; padding-left: 620px; padding-top: 10px;">
+                <el-pagination v-on:size-change="handleSizeChange"
+                               v-on:current-change="handleCurrentChange"
+                               :currentpage="currentPage"
+                               :page-sizes="[4, 8, 12, 16]"
+                               :page-size="pageSize"
+                               layout="total, sizes, prev, pager, next, jumper"
+                               :total="rows">
+                </el-pagination>
+            </div>
+        </form>
+    </div>
+    <script type="text/javascript">
+        var vm = new Vue({
+            el: "#app",
+            data() {
+                return {
+                    tableData: [],
+                    currentPage: 1,
+                    pageSize: 4,
+                    rows: 1,
+                }
+            }, methods: {
+                fill() {
+                    var splicing = "check_status=0";
+                    axios.get("/HumanFile/MoObscureTwo", {
+                        params: {
+                            PageSize: this.pageSize,
+                            CurrentPage: this.currentPage,
+                            Condition: splicing
+                        }
+                    }).then(res => {
+                        this.tableData = res.data.List;
+                        this.rows = res.data.Rows;
+                    }).catch(err => {
+                        console.log(err);
+                    })
+                }, handleSizeChange: function (size) {
+                    this.pageSize = size;
+                    this.currentPage = 1;
+                    this.fill();
+                },
+                handleCurrentChange: function (cpage) {
+                    this.currentPage = cpage;
+                    this.fill();
+                },
+                handleDelete(row) {
+                    location.href = "/HumanFile/ReviewOK?id=" + row.human_id;
+                }
+            },
+            mounted: function () {
+                this.fill();
+            }
+        })
+    </script>
+</body>
+</html>

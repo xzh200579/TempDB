@@ -1,0 +1,127 @@
+﻿@{
+    Layout = null;
+}
+
+@using Model;
+@model IEnumerable<Config_file_second_kind>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="../../css/table.css" type="text/css">
+    <script type="text/javascript" src="../../javascript/comm/comm.js"></script>
+    <script src="~/Scripts/vue/dist/vue.js"></script>
+    <script src="~/Scripts/element-ui/lib/index.js"></script>
+    <link href="~/Scripts/element-ui/lib/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/axios/dist/axios.js"></script>
+</head>
+<body>
+    <div id="app">
+        <form action="" method="post">
+            <table width="100%">
+                <tbody>
+                    <tr>
+                        <td>
+                            <font color="black">
+                                您正在做的业务是：人力资源--客户化设置--人力资源档案管理设置--II级机构设置
+                            </font>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right">
+                            <input type="button" value="添加" style=" width: 100px; border-radius: 10px; height: 29px;" class="BUTTON_STYLE1" onclick="window.location.href='/Cfsecondk/InsertTwo'">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <el-table :data="tableData"
+                      border
+                      style="width: 100%">
+                <el-table-column prop="fsk_id"
+                                 label="编号"
+                                 width="208px">
+                </el-table-column>
+                <el-table-column prop="first_kind_name"
+                                 label="I级机构名称"
+                                 width="228px">
+                </el-table-column>
+                <el-table-column prop="second_kind_id"
+                                 label="II级机构编号"
+                                 width="254px">
+                </el-table-column>
+                <el-table-column prop="second_kind_name"
+                                 label="II级机构名称"
+                                 width="256px">
+                </el-table-column>
+                <el-table-column prop="second_salary_id"
+                                 label="薪酬发放责任人编号"
+                                 width="208px">
+                </el-table-column>
+                <el-table-column prop="second_sale_id"
+                                 label="销售责任人编号"
+                                 width="258px">
+                </el-table-column>
+                <el-table-column label="操作"
+                                 width="228px">
+                    <template slot-scope="scope">
+                        <el-button type="primary" v-on:click="SelectTwoUpdate(scope.row.fsk_id)">修改</el-button>
+                        <el-button type="danger"  v-on:click="delect(scope.row.fsk_id)">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <br><br>
+            <p>
+            </p>
+        </form>
+        </div>
+        <script type="text/javascript">
+            var vm = new Vue({
+                el: "#app",
+                data: {
+                    tableData: [],//进行存储数据
+                },
+                methods: {
+                    fill: function () {
+                        axios.get("/Cfsecondk/FindTwo").then(res => {
+                            console.log(res);
+                            this.tableData = res.data;
+                        }).catch(err => {
+                            console.log(err);
+                        })
+                       }, delect(row) {
+                                this.$confirm('确定删除此记录嘛?', '提示', {
+                                    confirmButtonText: '确定',
+                                    cancelButtonText: '取消',
+                                    type: 'warning'
+                                }).then(() => {
+                                    axios.get("/Cfsecondk/DeleteTwo", {
+                                        params: {
+                                            id: row
+                                        }
+                                    }).then(res => {
+                                        if (res.data > 0) {
+                                            this.$message({
+                                                type: 'success',
+                                                message: '删除成功!'
+                                            });
+                                            location.href = 'DelectTwo';
+                                            this.fill();
+                                        }
+                                    })
+                                }).catch(() => {
+                                    this.$message({
+                                        type: 'warning',
+                                        message: '取消删除!'
+                                    });
+                                })
+                    }, SelectTwoUpdate(row) {
+                        location.href = "/Cfsecondk/UpdateTwo?id=" + row;
+                    }
+                },
+                    mounted: function () {
+                        this.fill();
+                    }
+                })
+        </script>
+</body>
+</html>
+

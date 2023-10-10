@@ -1,0 +1,292 @@
+﻿
+@{
+    Layout = null;
+}
+@using Model;
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="../../css/table.css" type="text/css">
+    <link rel="stylesheet" href="../../css/table.css" type="text/css" />
+    <script type="text/javascript" src="../../javascript/jquery-1.7.2.js"></script>
+    <link href="~/Scripts/element-ui/lib/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/axios/dist/axios.js"></script>
+    <script type="text/javascript" src="../../javascript/comm/comm.js"></script>
+    <script src="~/Scripts/vue/dist/vue.js"></script>
+    <script src="~/Scripts/element-ui/lib/index.js"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <style type="text/css">
+        #d {
+            background-color: #FFFFBB;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            filter: alpha(opacity:20);
+            opacity: 0.2;
+            position: fixed;
+            display: none;
+        }
+
+        #parent {
+            border: 1px solid #FFDB6F;
+            width: 400px;
+            height: 200px;
+            position: absolute;
+            z-index: 2;
+            top: 20%;
+            left: 25%;
+            position: fixed;
+            display: none;
+        }
+
+        #child {
+            width: 100%;
+            height: 100%;
+            color: #C66C35;
+            font-size: 15px;
+            text-align: center;
+            line-height: 25px;
+            font-weight: bold;
+        }
+
+        .button {
+            height: 30px;
+            width: 90px;
+            border-color: #D4DEE7;
+            background-color: #D4DEE7;
+            font-weight: bold;
+            font-size: 15px;
+            color: #481858;
+            cursor: pointer;
+            BORDER-BOTTOM: #D4DEE7 1px solid;
+            FILTER: progid:DXImageTransform.Microsoft.Gradient(GradientType=0, StartColorStr=#ffffff, EndColorStr=#C3DAF5);
+        }
+    </style>
+    <script type="text/javascript" src="../../javascript/jquery-1.7.2.js">
+
+
+    </script>
+    <script type="text/javascript">
+        $(function () {
+            $("#button1").click(function () {
+                $("#table1").hide(800);
+                $("#table2").hide(800);
+
+                $("#d").show(1800);
+                $("#parent").fadeIn(2200);
+            });
+            $("#close").click(function () {
+                $("#d").hide(800);
+                $("#parent").hide(600);
+
+                $("#table1").show(1000);
+                $("#table2").show(1000);
+
+            });
+            $("#sure").click(function () {
+
+                $("#d").hide(800);
+                $("#parent").fadeOut(600);
+
+                $("#table1").show(1000);
+                $("#table2").show(1000);
+                $("form:first").submit();
+            });
+        });
+
+
+    </script>
+</head>
+
+
+
+<body>
+    <div id="app">
+        @{Salary_standard salary = ViewBag.s; }
+        <form action="" method="post">
+            <input type="hidden" name="standard.standardId" value="1353320112255">
+
+            <div id="d"></div>
+            <div id="parent">
+                <div id="child">
+                    <br><br>
+                    @salary.checker
+                    ,您确认打印此页面的信息吗？<br><br><br>
+                    <input type="button" class="button" value="确 定" id="sure" v-on:click="printExcel()">
+                    <input type="button" class="button" value="取 消" id="close">
+                </div>
+            </div>
+            <table width="100%" id="table1">
+                <tbody>
+                    <tr>
+                        <td>
+                            <font color="black">您正在做的业务是:人力资源管理--薪酬标准管理--薪酬标准登记查询</font>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div align="right">
+                                <input type="button" value="打印" id="button1" class="BUTTON_STYLE1">
+                                <input type="button" value="返回" onclick="location.href='javascript:history.back(-1)'" class="BUTTON_STYLE1">
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table width="100%" border="1" cellpadding="0" cellspacing="1" bordercolorlight="#848284" bordercolordark="#eeeeee" id="table2" class="TABLE_STYLE1">
+                <tr>
+                    <td width="12%" class="TD_STYLE1">
+                        薪酬编号
+                    </td>
+                    <td width="15%" class="TD_STYLE2">
+                        @salary.standard_id
+                    </td>
+                    <td width="12%" class="TD_STYLE1">
+                        薪酬标准名称
+                    </td>
+                    <td width="11%" class="TD_STYLE2">
+                        @salary.standard_name
+                    </td>
+                    <td width="11%" class="TD_STYLE1">
+                        薪酬总额
+                    </td>
+                    <td width="17%" class="TD_STYLE2">
+                        @salary.salary_sum
+                    </td>
+                </tr>
+                <tr>
+                    <td class="TD_STYLE1">
+                        制定人
+                    </td>
+                    <td class="TD_STYLE2">
+                        @salary.designer
+                    </td>
+                    <td class="TD_STYLE1">
+                        复核人
+                    </td>
+                    <td class="TD_STYLE2">
+                        @salary.checker
+                    </td>
+                    <td class="TD_STYLE1">
+                        复核时间
+                    </td>
+                    <td class="TD_STYLE2">
+                        @salary.check_time
+                    </td>
+                </tr>
+                <tr>
+                    <td class="TD_STYLE1">
+                        复核意见
+                    </td>
+                    <td colspan="7" class="TD_STYLE2" height="68">
+                        @salary.check_comment
+                    </td>
+                </tr>
+                <tr>
+                    <td class="TD_STYLE1">
+                        序号
+                    </td>
+                    <td colspan="3" class="TD_STYLE1">
+                        薪酬项目名称
+                    </td>
+                    <td colspan="4" class="TD_STYLE1">
+                        金额
+                    </td>
+                </tr>
+
+                <tr class="TD_STYLE2" v-for="item in tableData" :key="item.id">
+                <td align="center">
+                    {{item.item_id}}
+                </td>
+                <td colspan="3">
+                    {{item.item_name}}
+                </td>
+                <td>
+                    {{item.salary}}
+                </td>
+                <td colspan="3">
+                    &nbsp;
+                </td>
+            </tr>
+            </table>
+           
+        </form>
+    </div>
+    <script type="text/javascript">
+        var vm = new Vue({
+            el: "#app",
+            data() {
+                return {
+                    tableData: [],
+                    table:[],
+                }
+            },
+            methods: {
+                fill() {
+                    axios.get("/SalaDetails/FuX", {
+                        params: {
+                            id:@salary.standard_id,
+                        }
+                    })
+                        .then(res => {
+                            this.tableData = res.data;
+                            var rawTimestamp = '@Html.Raw(Json.Encode(@salary.check_time))';
+                            var numericTimestamp = parseInt(rawTimestamp.match(/\d+/)[0]);
+                                    this.table.push({
+                                        standard_id: @Html.Raw(Json.Encode(@salary.standard_id))  ,
+                                        standard_name:  @Html.Raw(Json.Encode(@salary.standard_name)) ,
+                                        salary_sum: @Html.Raw(Json.Encode(@salary.salary_sum)) ,
+                                        designer:@Html.Raw(Json.Encode(@salary.designer))   ,
+                                        checker:@Html.Raw(Json.Encode(@salary.checker))  ,
+                                        check_comment:@Html.Raw(Json.Encode(@salary.check_comment))  ,
+                                        check_time: new Date(numericTimestamp)
+                                    });
+                            console.log(this.table);
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        })
+                },
+                printExcel() {
+                    //const XLSX = require('xlsx');
+                    // 合并数据数组
+                    var mergedData = this.tableData.concat(this.table);
+                    // 创建新工作簿和工作表
+                    var workbook = XLSX.utils.book_new();
+                    var worksheet = XLSX.utils.json_to_sheet(mergedData);
+                    // 将工作表添加到工作簿中
+                    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+                    // 将工作簿转换为二进制字符串
+                    var workbookBinary = XLSX.write(workbook, { bookType: "xlsx", type: "binary" });
+                    // 将二进制字符串转换为 Blob
+                    var blob = new Blob([stringToByteArray(workbookBinary)], {
+                        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    });
+                    // 生成用于下载的链接
+                    var link = document.createElement("a");
+                    link.href = URL.createObjectURL(blob);
+                    link.download = "data.xlsx";
+                    link.click();
+                }
+
+            },
+            mounted: function () {
+                this.fill();
+            }
+        });
+        function stringToByteArray(string) {
+            var buffer = new ArrayBuffer(string.length);
+            var byteArray = new Uint8Array(buffer);
+            for (var i = 0; i < string.length; i++) {
+                byteArray[i] = string.charCodeAt(i) & 0xFF;
+            }
+            return buffer;
+        }
+    </script>
+</body>
+</html>

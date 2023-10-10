@@ -1,0 +1,58 @@
+﻿
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+@using Model
+@model config_major
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Insert</title>
+    <link href="~/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+    <link href="~/Scripts/element-ui/lib/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/javascript/jquery-3.6.1.min.js"></script>
+
+</head>
+<body>
+    <div>
+        @using (Html.BeginForm("MajorAdd", "Cmajor", FormMethod.Post))
+        {
+            <table width="100%">
+                <tr>
+                    <td align="right">
+                        <input type="submit" value="提交" class="BUTTON_STYLE1">
+                        <input type="button" value="返回" class="BUTTON_STYLE1"
+                               onclick="history.back();">
+                    </td>
+                </tr>
+            </table>
+            <div class="form-group">
+                @Html.LabelFor(e => e.major_kind_id)
+            
+                @Html.DropDownListFor(e => e.major_kind_id, ViewBag.s1 as IEnumerable<SelectListItem>,"--请选择--", new { @class ="form-control" ,@onchange="finde()",@id="a" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(e => e.major_kind_name)
+                @Html.TextBoxFor(e => e.major_kind_name, "", new { @class = "form-control",disabled="disabled",@id="name" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(e => e.major_id)
+                @Html.TextBoxFor(e => e.major_id, "", new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(e => e.major_name)
+                @Html.TextBoxFor(e => e.major_name, "", new { @class = "form-control" })
+            </div>
+        }
+    </div>
+   <script>
+       function finde() {
+           var id = a.value;
+           console.log(id);
+           $("#name").val(id);
+       }
+   </script>
+</body>
+</html>

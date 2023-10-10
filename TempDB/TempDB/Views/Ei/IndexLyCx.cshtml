@@ -1,0 +1,130 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>IndexLyCx</title>
+    <script src="~/Scripts/vue/dist/vue.js"></script>
+    <script src="~/Scripts/element-ui/lib/index.js"></script>
+    <link href="~/Scripts/element-ui/lib/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/axios/dist/axios.js"></script>
+</head>
+</head>
+<body>
+    <table width="100%">
+        <tr>
+            <td>
+                <font color="black">
+                    您正在做的业务是：人力资源--招聘管理--录用管理--录用申请
+                </font>
+            </td>
+        </tr>
+    </table>
+    <div id="app">
+        <el-table :data="data"
+                  style="width: 100%">
+            <el-table-column prop="human_name"
+                             label="姓名"
+                             width="180">
+            </el-table-column>
+            <el-table-column prop="human_sex"
+                             label="性别"
+                             width="180">
+            </el-table-column>
+            <el-table-column prop="human_age"
+                             label="年龄"
+                             width="180">
+            </el-table-column>
+            <el-table-column prop="human_major_kind_name"
+                             label="职位类别"
+                             width="180">
+            </el-table-column>
+            <el-table-column prop="human_major_name"
+                             label="职位名称"
+                             width="180">
+            </el-table-column>
+            <el-table-column prop="human_college"
+                             label="毕业院校"
+                             width="180">
+            </el-table-column>
+            <el-table-column prop="human_educated_major"
+                             label="学历专业"
+                             width="180">
+            </el-table-column>
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button size="mini" type="danger" v-on:click="update1(scope.row)">申请</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination v-on:size-change="handleSizeChange"
+                       v-on:current-change="handleCurrentChange"
+                       :currentpage="currentPage"
+                       :page-sizes="[2, 4, 8, 16]"
+                       :page-size="pageSize"
+                       layout="total, sizes, prev, pager, next, jumper"
+                       :total="rows">
+        </el-pagination>
+    </div>
+    <script>
+        var vm = new Vue({
+            el: "#app",
+            data: {
+                data: [],
+                currentPage: 1,
+                pageSize: 2,
+                rows: 1,
+            },
+            methods: {
+                fill: function () {
+                    var t = this;
+                    axios.get('/Ei/Index2LyCx', {
+                        params: {
+                            CurrentPage: t.currentPage,
+                            PageSize: t.pageSize
+                        }
+                    }).then(res => {
+                        t.data = res.data.List;
+                        t.rows = res.data.Rows;
+                        console.log(res)
+                    }).catch(err => {
+                        console.log(err);
+                    })
+                }, handleSizeChange: function (size) {
+                    this.pageSize = size;
+                    this.currentPage = 1;
+                    this.fill();
+                },
+                handleCurrentChange: function (cpage) {
+                    this.currentPage = cpage;
+                    this.fill();
+                },
+                update1(scope) {
+                    console.log(scope);
+                    location.href = '/Ei/ErSelectId?id=' + scope.res_id + '';
+
+                },
+            },
+            filters: {
+                ftime: function (value, spe) {
+                    if (value == '/Date(-1675353600000)/') {
+                        return '空'
+                    }
+                    .0
+                    var dt = new Date(parseInt(value.replace("/Date(", "").replace(")/", ""), 10));
+                    return dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
+                }
+            },
+            mounted: function () {
+                this.fill();
+            }
+
+        })
+    </script>
+</body>
+</html>

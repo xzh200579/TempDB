@@ -1,0 +1,121 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script src="~/Scripts/vue/dist/vue.js"></script>
+    <script src="~/Scripts/element-ui/lib/index.js"></script>
+    <link href="~/Scripts/element-ui/lib/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/axios/dist/axios.js"></script>
+</head>
+<body>
+    <table width="100%">
+        <tr>
+            <td>
+                <font color="black">您正在做的业务是：人力资源--人力资源档案管理--人力资源档案登记复核 </font>
+            </td>
+        </tr>
+    </table>
+    <div id="app">
+        <el-table :data="data"
+                  style="width: 100%">
+            <el-table-column prop="human_id"
+                             label="档案编号"
+                             width="180">
+            </el-table-column>
+            <el-table-column prop="human_name"
+                             label="姓名"
+                             width="180">
+            </el-table-column>
+            <el-table-column prop="human_sex"
+                             label="性别"
+                             width="180">
+            </el-table-column>
+            <el-table-column prop="first_kind_name"
+                             label="I级机构"
+                             width="180">
+            </el-table-column>
+            <el-table-column prop="second_kind_name"
+                             label="II级机构"
+                             width="180">
+            </el-table-column>
+            <el-table-column prop="third_kind_name"
+                             label="III级机构"
+                             width="180">
+            </el-table-column>
+            <el-table-column prop="human_pro_designation"
+                             label="职称"
+                             width="180">
+            </el-table-column>
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button size="mini" type="danger" v-on:click="update1(scope.row)">复核</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination v-on:size-change="handleSizeChange"
+                       v-on:current-change="handleCurrentChange"
+                       :currentpage="currentPage"
+                       :page-sizes="[2, 4, 8, 16]"
+                       :page-size="pageSize"
+                       layout="total, sizes, prev, pager, next, jumper"
+                       :total="rows">
+        </el-pagination>
+    </div>
+    <script type="text/javascript">
+        var vm = new Vue({
+            el: "#app",
+            data: {
+                data: [],
+                currentPage: 1,
+                pageSize: 2,
+                rows: 1,
+            },
+            methods: {
+                fill: function () {
+                    var t = this;
+                    var sp ="checker_status=0"
+                    axios.get('/Hfile/Index2', {
+                        params: {
+                            CurrentPage: t.currentPage,
+                            PageSize: t.pageSize,
+                            Condition: sp
+                        }
+                    }).then(res => {
+                        t.data = res.data.List;
+                        t.rows = res.data.Rows;
+                        console.log(res)
+                    }).catch(err => {
+                        console.log(err);
+                    })
+                }, handleSizeChange: function (size) {
+                    this.pageSize = size;
+                    this.currentPage = 1;
+                    this.fill();
+                },
+                handleCurrentChange: function (cpage) {
+                    this.currentPage = cpage;
+                    this.fill();
+                },
+                update1(scope) {
+                    console.log(scope);
+                    location.href = '/Hfile/UpdateCx?id=' + scope.huf_id + '';
+
+                }
+
+            },
+            mounted: function () {
+                this.fill();
+            }
+
+        })
+    </script>
+</body>
+
+</html>

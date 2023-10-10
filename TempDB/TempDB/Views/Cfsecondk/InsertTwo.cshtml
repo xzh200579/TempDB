@@ -1,0 +1,161 @@
+﻿
+@{
+    Layout = null;
+}
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="../../css/table.css" type="text/css">
+    <script type="text/javascript" src="../../javascript/comm/comm.js"></script>
+    <script src="~/Scripts/element-ui/lib/index.js"></script>
+    <link href="~/Scripts/element-ui/lib/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/axios/dist/axios.js"></script>
+    <script src="~/Scripts/vue/dist/vue.js"></script>
+    <script src="~/Scripts/element-ui/lib/index.js"></script>
+</head>
+    <script type="text/javascript">
+		function check(){
+			if (document.getElementById("firstKind.ffkId").value==0){
+				alert("请选择I级机构名称!!!");
+				return false;
+			}
+			if (document.getElementById("secondKind.secondKindName").value==""){
+				alert("II级机构名称不能为空!!!");
+				return false;
+			}
+			if (document.getElementById("secondKind.secondSalaryId").value==""){
+				alert("薪酬发放责任人编号不能为空!!!");
+				return false;
+			}
+			if (document.getElementById("secondKind.secondSaleId").value==""){
+				alert("销售责任人编号不能为空!!!");
+				return false;
+			}
+			document.forms[0].submit();
+		}
+		function change(){
+		var se=document.getElementById("firstKindId");
+		document.getElementById("firstKindName").value=se.options[se.selectedIndex].innerHTML;
+
+		}
+    </script>
+</head>
+
+
+<body>
+    <div id="app">
+        <form action="" method="post" v-on:submit="subTwoTj()">
+            <input type="hidden" id="firstKindName" name="cfsk.firstKindName">
+            <table width="100%">
+                <tbody>
+                    <tr>
+                        <td>
+                            <font color="black">
+                                您正在做的业务是：人力资源--客户化设置--人力资源档案管理设置--II级机构设置--II级机构添加
+                            </font>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right">
+                            <input type="submit" value="提交" class="BUTTON_STYLE1" style="width: 65px; height: 30px; border-radius: 5px">
+                            <input type="button" value="返回" class="BUTTON_STYLE1" style="width: 65px; height: 30px; border-radius: 5px" onclick="history.back();">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table width="100%" border="1" cellpadding="0" cellspacing="1" bordercolorlight="#848284" bordercolordark="#eeeeee" class="TABLE_STYLE1">
+                <tbody>
+                    <tr>
+                        <td width="19%" class="TD_STYLE1">
+                            I级机构名称
+                        </td>
+                        <td width="81%" class="TD_STYLE2">
+                            <select name="cfsk.firstKindId" id="firstKindId" onchange="change()" v-model="optionst">
+                                <option v-for="option in options">{{option.first_kind_name}}</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="19%" class="TD_STYLE1">
+                            II级机构编号
+                        </td>
+                        <td width="81%" class="TD_STYLE2">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="TD_STYLE1">
+                            II级机构名称
+                        </td>
+                        <td class="TD_STYLE2">
+                            <input type="text" class="INPUT_STYLE1" name="cfsk.secondKindName" v-model="TwoName">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="TD_STYLE1">
+                            薪酬发放责任人编号（多个编号之间请用"半角逗号"加"一个空格"隔开，如", "）
+                        </td>
+                        <td class="TD_STYLE2">
+                            <textarea rows="4" cols="" class="TEXTAREA_STYLE1" name="cfsk.secondSalaryId" v-model="ZRBH"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="TD_STYLE1">
+                            销售责任人编号（多个编号之间请用"半角逗号"加"一个空格"隔开，如", "）
+                        </td>
+                        <td class="TD_STYLE2">
+                            <textarea rows="4" cols="" class="TEXTAREA_STYLE1" name="cfsk.secondSaleId" v-model="XSBH"></textarea>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+    <script type="text/javascript">
+        var vm = new Vue({
+            el: "#app",
+            data(){
+                return {
+                    options: [],//进行存储数据
+                    TwoName: "",
+                    ZRBH: "",
+                    optionst:"",
+                    XSBH: "",
+                }
+            }, methods: {
+                fill: function () {
+                    axios.get("/Cfsecondk/CXOne").then(res => {
+                        console.log(res);
+                        this.options = res.data;
+                    }).catch(err => {
+                        console.log(err);
+                    })
+                }, subTwoTj() {
+                    const SSOPtion = this.options.find(option => option.first_kind_name === this.optionst);
+                    axios.get("/Cfsecondk/Intset", {
+                        params: {
+                            first_kind_id: SSOPtion.first_kind_id,
+                            first_kind_name: SSOPtion.first_kind_name,
+                            second_kind_name: this.TwoName,
+                            second_salary_id: this.ZRBH,
+                            second_sale_id: this.XSBH,
+                        }
+                    }).then(res => {
+                        if (res.data == "1") {
+                            location.href = 'AddTwo';
+                        }
+                    }).catch(err => {
+                        console.log(err);
+                    })
+                },
+            },
+            mounted: function () {
+                this.fill();
+            }
+        })
+    </script>
+
+
+</body>
+</html>
+

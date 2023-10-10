@@ -1,0 +1,148 @@
+﻿@{
+    Layout = null;
+}
+@using Model;
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script type="text/javascript"
+            src="../../javascript/jquery-1.7.2.js">
+    </script>
+    <link rel="stylesheet" href="../../css/table.css" type="text/css" />
+    <script type="text/javascript" src="../../javascript/comm/comm.js"></script>
+    <title>无标题文档</title>
+    <STYLE type="text/css">
+        td {
+            text-align: center
+        }
+    </STYLE>
+
+    <script src="~/Scripts/vue/dist/vue.js"></script>
+    <script src="~/Scripts/element-ui/lib/index.js"></script>
+    <link href="~/Scripts/element-ui/lib/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/axios/dist/axios.js"></script>
+</head>
+
+<body>
+    <div id="app">
+
+        <table width="100%">
+            <tr>
+                <td colspan="2" style="text-align: left">
+                    <font color="black">
+                        您正在做的业务是：人力资源--薪酬标准管理--薪酬发放登记(负责人控制)
+                    </font>
+                </td>
+            </tr>
+        </table>
+        <br>
+        薪酬总数: {{tia}}
+        总人数: {{rs}}，基本薪酬总数: {{jb}}，实发总额: {{shi}}
+        <table width="100%" border="1" cellpadding=0 cellspacing=1
+               bordercolorlight=#848284 bordercolordark=#eeeeee
+               class="TABLE_STYLE1">
+        </table>
+        <table width="100%" border="1" cellpadding=0 cellspacing=1
+               bordercolorlight=#848284 bordercolordark=#eeeeee
+               class="TABLE_STYLE1">
+
+            <el-table :data="tableData"
+                      border
+                      style="width: 100%"
+                      :header-cell-style="{ fontSize: '20px', height:'70px'}">
+                <el-table-column prop="huf_id"
+                                 label="序号"
+                                 width="180">
+                </el-table-column>
+                <el-table-column prop="first_kind_name"
+                                 label="I级机构名称"
+                                 width="240">
+                </el-table-column>
+                <el-table-column prop="second_kind_name"
+                                 label="II级机构名称"
+                                 width="240">
+                </el-table-column>
+                <el-table-column prop="third_kind_name"
+                                 label="III级机构名称"
+                                 width="240">
+                </el-table-column>
+                <el-table-column prop="human_amount"
+                                 label="人数"
+                                 width="200">
+                </el-table-column>
+                <el-table-column prop="salary_sum"
+                                 label="基本薪酬总额(元)"
+                                 width="220">
+                </el-table-column>
+                <el-table-column label="登记">
+                    <template slot-scope="scope">
+                        <el-button type="primary" @*size="mini"*@
+                                   v-on:click="handleEdit(scope.row)">登记</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </table>
+        <p>
+
+            &nbsp;
+        </p>
+    </div>
+    <script type="text/javascript">
+        var vm = new Vue({
+            el: "#app",
+            data() {
+                return {
+                    tableData: [],
+                    tia: "",
+                    zong: 0,
+                    jb: 0,
+                    rs: 0,
+                    shi:0,
+                }
+            },
+            methods: {
+                fill() {
+                    axios.get("/Salarygrant/ChaJuTi?tiao=" +@Html.Raw(Json.Encode(ViewBag.i)))
+                        .then(res => {
+                            this.tableData = res.data;
+                            this.tia = this.tableData.length;
+                            this.rs = res.data.length;
+                            for (var i = 0; i <this.tableData.length; i++) {
+                                this.jb += this. tableData[i].salary_sum;
+                                this.shi += this.tableData[i].demand_salaray_sum;
+                            }
+
+                            console.log("tableData:"+ this.tableData);
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        })
+                },
+                handleEdit(row) {
+                    console.log(row);
+                    var sql = "";
+                    var name = "";
+                    if (row.first_kind_name != null) {
+                        sql = "  check_status=3  AND first_kind_name IS NOT NULL AND second_kind_name IS NULL AND second_kind_name IS NULL AND first_kind_name = '" + row.first_kind_name+"'";
+                        name = row.first_kind_name;
+                    }
+                    if (row.second_kind_name != null) {
+                        sql = "  check_status=3  AND first_kind_name IS NOT NULL AND second_kind_name IS NOT NULL AND third_kind_name IS NULL AND second_kind_name =  '" + row.second_kind_name+"'";
+                        name = row.second_kind_name;
+                    }
+                    if (row.third_kind_name != null) {
+                        sql = " check_status=3  AND first_kind_name IS NOT NULL AND second_kind_name IS NOT NULL AND third_kind_name IS NOT NULL AND third_kind_name = '" + row.third_kind_name+"'";
+                        name = row.third_kind_name;
+                    }
+                    location.href = "/Salarygrant/PayCheck?id=" +sql+"&name="+name;
+                }
+            },
+            mounted: function () {
+                this.fill();
+            }
+        });
+    </script>
+</body>
+</html>

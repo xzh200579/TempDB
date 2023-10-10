@@ -1,0 +1,39 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+@using Model
+@model  config_major_kind
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Insert</title>
+    <link href="~/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+</head>
+<body>
+    <div>
+        @using (Html.BeginForm("Insert1", "Cmkind", FormMethod.Post))
+        {
+            <table width="100%">
+                <tr>
+                    <td align="right">
+                        <input type="submit" value="提交" class="BUTTON_STYLE1">
+                        <input type="button" value="返回" class="BUTTON_STYLE1"
+                               onclick="history.back();">
+                    </td>
+                </tr>
+            </table>
+            <div class="form-group" >
+              @Html.LabelFor(e=>e.major_kind_id)
+                @Html.TextBoxFor(e => e.major_kind_id,  "", new { @class = "form-control", @readonly = "readonly" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(e => e.major_kind_name)
+                @Html.TextBoxFor(e => e.major_kind_name, "", new { @class = "form-control" })
+            </div>
+        }
+    </div>
+</body>
+</html>

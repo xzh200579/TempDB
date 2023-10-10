@@ -1,0 +1,97 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index1</title>
+    <script src="~/Scripts/vue/dist/vue.js"></script>
+    <script src="~/Scripts/element-ui/lib/index.js"></script>
+    <link href="~/Scripts/element-ui/lib/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/axios/dist/axios.js"></script>
+    <link rel="stylesheet" href="../../css/table.css" type="text/css">
+    <script type="text/javascript" src="../../javascript/comm/comm.js"></script>
+    <script src="~/Scripts/vue/dist/vue.js"></script>
+    <script src="~/Scripts/element-ui/lib/index.js"></script>
+</head>
+<body>
+    <div id="app">
+        <table width="100%">
+            <tbody>
+                <tr>
+                    <td>
+                        <font color="black">
+                            您正在做的业务是：人力资源--客户化设置--人力资源档案管理设置--职称设置
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <el-table :data="data"
+                  border
+                  style="width: 100%">
+            <el-table-column prop="attribute_name"
+                             label="职称名称"
+                             width="880px">
+            </el-table-column>
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button size="mini" type="danger" v-on:click="delete2(scope.row.pbc_id)" style="width:70px;height:40px">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </div>
+    <script>
+        var vm = new Vue({
+            el: "#app",
+            data: {
+                data: [],
+            },
+            methods: {
+                fill: function () {
+                    axios.get("/Cpchar/Index3").then(res => {
+                        this.data = res.data;
+                        console.log(res)
+                    }).catch(err => {
+                        console.log(err);
+                    })
+            },
+            delete2(id) {
+                console.log(id);
+                var t = this;
+                if (confirm("是否确认删除")) {
+                    axios.get('/Cpchar/CharDelete1', {
+                        params: {
+                            id: id
+                        }
+                    }).then(res => {
+                        console.log(res.data);
+                        if (res.data = 1) {
+                            this.$message({
+                                message: "删除成功",
+                                type: "success"
+                            });
+                            t.fill();
+                        } else {
+                            alert("删除失败");
+                        }
+                    })
+                }
+            }
+        },
+            mounted: function () {
+                this.fill();
+            },
+        })
+
+    </script>
+</body>
+</html>

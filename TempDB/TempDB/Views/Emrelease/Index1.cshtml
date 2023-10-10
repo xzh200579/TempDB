@@ -1,0 +1,163 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index1</title>
+    <script src="~/Scripts/vue/dist/vue.js"></script>
+    <script src="~/Scripts/element-ui/lib/index.js"></script>
+    <link href="~/Scripts/element-ui/lib/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/axios/dist/axios.js"></script>
+</head>
+<body>
+    <table width="100%">
+        <tr>
+            <td>
+                <font color="black">
+                    您正在做的业务是：人力资源--招聘管理--职位发布管理--职位发布变更
+                </font>
+            </td>
+        </tr>
+    </table>
+    <div id="app">
+        <el-table :data="data"
+                  style="width: 100%">
+            <el-table-column prop="major_name"
+                             label="职位名称"
+                             width="180">
+            </el-table-column>
+            <el-table-column prop="second_kind_name"
+                             label="公司名称"
+                             width="180">
+            </el-table-column>
+            <el-table-column prop="human_amount"
+                             label="招聘人数"
+                             width="180">
+            </el-table-column>
+            <el-table-column prop="regist_time"
+                             label="发布时间"
+                             width="180">
+                <template slot-scope="{ row }">
+                    {{ row.regist_time | ftime }}
+                </template>
+            </el-table-column>
+            <el-table-column prop="deadline"
+                             label="截止时间"
+                             width="180">
+                <template slot-scope="{ row }">
+                    {{ row.deadline | ftime }}
+                </template>
+            </el-table-column>
+       
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button size="mini" type="danger" v-on:click="update1(scope.row)">修改</el-button>
+                    <el-button size="mini" type="danger" v-on:click="delete2(scope.row.mre_id)">删除</el-button>
+
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination v-on:size-change="handleSizeChange"
+                       v-on:current-change="handleCurrentChange"
+                       :currentpage="currentPage"
+                       :page-sizes="[2, 4, 8, 16]"
+                       :page-size="pageSize"
+                       layout="total, sizes, prev, pager, next, jumper"
+                       :total="rows">
+        </el-pagination>
+    </div>
+    <script>
+        var vm = new Vue({
+            el: "#app",
+            data: {
+                data:[],
+                currentPage: 1,
+                pageSize: 2,
+                rows: 1,
+            },
+            methods: {
+                fill: function () {
+                    var sp = "checke=0";
+                    var t = this;
+                    axios.get('/Emrelease/Index2', {
+                        params: {
+                            CurrentPage: t.currentPage,
+                            PageSize: t.pageSize,
+                            Condition: sp
+                        }
+                    }).then(res => {
+                        t.data = res.data.List;
+                        t.rows = res.data.Rows;
+                        console.log(res)
+                    }).catch(err => {
+                        console.log(err);
+                    })
+                }, handleSizeChange: function (size) {
+                    this.pageSize = size;
+                    this.currentPage = 1;
+                    this.fill();
+                },
+                handleCurrentChange: function (cpage) {
+                    this.currentPage = cpage;
+                    this.fill();
+                },
+                update1(scope1) {
+                    console.log(scope1);
+                    location.href = '/Emrelease/Update?id=' + scope1.mre_id + '&&name=' + scope1.first_kind_name + '&&name1=' + scope1.second_kind_name + 'name3=' + scope1.major_kind_name + '';
+                },
+            delete2(id) {
+                console.log(id);
+                var t = this;
+                if (confirm("是否确认删除")) {
+                    axios.get('/Emrelease/EmDelete1', {
+                        params: {
+                            id: id
+                        }
+                    }).then(res => {
+                        console.log(res.data);
+                        if (res.data = 1) {
+                            this.$message({
+                                message: "删除成功",
+                                type: "success"
+                            });
+                            t.fill();
+                        } else {
+                            alert("删除失败");
+                        }
+                    })
+                }
+                },
+            },
+          
+            filters: {
+                ftime: function (value, spe) {
+                    if (value == '/Date(-1675353600000)/') {
+                        return '空'
+                    }
+                    .0
+                    var dt = new Date(parseInt(value.replace("/Date(", "").replace(")/", ""), 10));
+                    return dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
+                }
+            },
+            mounted: function () {
+                this.fill();
+            }
+            // xzhxgid: function (obj) {
+            //    this.udialogVisible = true;
+            //    var t = this;
+            //    t.xg.Id = obj.Id;
+            //    t.xg.Name = obj.Name;
+            //    t.xg.Pid = obj.Pid;
+            //},
+        })
+    </script>
+    <script>
+      
+    </script>
+</body>
+</html>

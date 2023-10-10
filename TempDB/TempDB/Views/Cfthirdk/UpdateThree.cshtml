@@ -1,0 +1,146 @@
+﻿
+@{
+    Layout = null;
+}
+@using Model;
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="../../css/table.css" type="text/css">
+    <script type="text/javascript" src="../../javascript/comm/comm.js"></script>
+    <script src="~/Scripts/axios/dist/axios.js"></script>
+    <script src="~/Scripts/vue/dist/vue.js"></script>
+    <script src="~/Scripts/element-ui/lib/index.js"></script>
+</head>
+<body>
+    <div id="app">
+        @{ Config_file_third_kind third_Kind = ViewBag.s;}
+        <form action="" method="post" v-on:submit="UpdThree()">
+            <table width="100%">
+                <tbody>
+                    <tr>
+                        <td>
+                            <font color="black">
+                                您正在做的业务是：人力资源--客户化设置--人力资源档案管理设置--III级机构设置--III级机构变更
+                            </font>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right">
+                            <input type="submit" value="提交" class="BUTTON_STYLE1"  style="width: 65px; height: 30px; border-radius: 5px">
+                            <input type="button" value="返回" class="BUTTON_STYLE1" onclick="history.back();"  style="width: 65px; height: 30px; border-radius: 5px">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table width="100%" border="1" cellpadding="0" cellspacing="1" bordercolorlight="#848284" bordercolordark="#eeeeee" class="TABLE_STYLE1">
+                <tr><td><input type="hidden" name="cfsk.ftkId" v-model="BH" class="INPUT_STYLE1"></td></tr>
+                <tbody>
+                    <tr>
+                        <td width="19%" class="TD_STYLE1">
+                            I级机构名称
+                        </td>
+                        <td width="81%" class="TD_STYLE2">
+                            <input type="text" readonly="readonly" class="INPUT_STYLE1" name="cftk.firstKindName" v-model="OneName">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="19%" class="TD_STYLE1">
+                            II级机构名称
+                        </td>
+                        <td width="81%" class="TD_STYLE2">
+                            <input type="text" readonly="readonly" class="INPUT_STYLE1" name="cftk.secondKindName" v-model="TwoName">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="19%" class="TD_STYLE1">
+                            III级机构编号
+                        </td>
+                        <td width="81%" class="TD_STYLE2">
+                            <input type="text" readonly="readonly" class="INPUT_STYLE1" name="cftk.thirdKindId" v-model="ThreeBh">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="TD_STYLE1">
+                            III级机构名称
+                        </td>
+                        <td class="TD_STYLE2">
+                            <input type="text" readonly="readonly" class="INPUT_STYLE1" name="cftk.thirdKindName" v-model="ThreeName">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="TD_STYLE1">
+                            销售责任人编号（多个编号之间请用"半角逗号"加"一个空格"隔开，如", "）
+                        </td>
+                        <td class="TD_STYLE2">
+                            <textarea rows="4" cols="120" class="TEXTAREA_STYLE1" name="cftk.thirdKindSaleId" v-model="XSBH"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="TD_STYLE1">
+                            是否为零售店（是/否）
+                        </td>
+                        <td class="TD_STYLE2">
+                            <select name="cftk.thirdKindIsRetail" v-model="sf">
+                                <option selected="selected">是</option>
+                                <option>否</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+    <script type="text/javascript">
+        var vm = new Vue({
+            el: "#app",
+            data(){
+                return {
+                    OneName: "",
+                    TwoName: "",
+                    ThreeBh: "",
+                    ThreeName: "",
+                    XSBH: "",
+                    BH: "",
+                    sf:"",
+                }
+            }, methods: {
+                  find() {
+                    this.OneName = @Html.Raw(Json.Encode(third_Kind.first_kind_name));
+                    this.TwoName = @Html.Raw(Json.Encode(third_Kind.second_kind_name));
+                    this.ThreeBh = @Html.Raw(Json.Encode(third_Kind.third_kind_id));
+                    this.ThreeName = @Html.Raw(Json.Encode(third_Kind.third_kind_name));
+                    this.XSBH = @Html.Raw(Json.Encode(third_Kind.third_kind_sale_id));
+                    this.sf = @Html.Raw(Json.Encode(third_Kind.third_kind_is_retail));
+                    this.BH = @Html.Raw(Json.Encode(third_Kind.ftk_id));
+                },
+                UpdThree() {
+                axios.get("/Cfthirdk/UpdateGai", {
+                    params: {
+                        third_kind_sale_id: this.XSBH,
+                        third_kind_is_retail: this.sf,
+                        ftk_id: this.BH
+                    }
+                }).then(res => {
+                    if (res.data == "1") {
+                        location.href = 'UpdateSuree';
+                    } else {
+                        alert(res.data);
+                        alert("修改失败");
+                    }
+                })
+                    .catch(err => {
+                        console.log(err);
+                    })
+                },
+            },
+            mounted: function () {
+                this.find();
+            }
+        })
+    </script>
+
+
+</body>
+</html>
+

@@ -1,0 +1,129 @@
+﻿
+@{
+    Layout = null;
+}
+@using Model;
+<!DOCTYPE html>
+<html>
+<head>
+   
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="../../css/table.css" type="text/css">
+    <script type="text/javascript" src="../../javascript/comm/comm.js"></script>
+    <script src="~/Scripts/vue/dist/vue.js"></script>
+    <script src="~/Scripts/element-ui/lib/index.js"></script>
+    <link href="~/Scripts/element-ui/lib/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/axios/dist/axios.js"></script>
+    @*<script type="text/javascript">
+            function deleteSalaryDetails(id) {
+                $.ajax({
+                    url: "/HR_Fist/customiz/customizAction!doDeleteSalaryDetails",
+                    data: "ssd.sdtId=" + id,
+                    dataType: "text",
+                    success: function () {
+                        alert("删除成功！");
+                        location.reload();
+                    },
+                    type: "post"
+                });
+            }
+        </script>
+
+        <script type="text/javascript">
+
+            function submission() {
+                document.forms[0].submit();
+            }
+
+            function page(currentPage) {
+                document.getElementById("pid").value = currentPage;
+                document.forms[0].submit();
+            }
+        </script>*@
+
+</head>
+
+<body>
+    <div id="app">
+        <table width="100%">
+            <tbody>
+                <tr>
+                    <td>
+                        <font color="black">
+                            您正在做的业务是：人力资源--客户化设置--薪酬管理设置--薪酬项目设置
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">
+                        <input type="button" value="添加" class="BUTTON_STYLE1" style=" width: 100px; border-radius: 10px; height: 29px;" onclick="window.location.href='/Cpchar/TianAdd'">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <el-table :data="tableData"
+                  border
+                  style="width: 100%">
+            <el-table-column prop="pbc_id"
+                             label="薪酬项目编号"
+                             width="400px">
+            </el-table-column>
+            <el-table-column prop="attribute_name"
+                             label="薪酬项目名称"
+                             width="1024px">
+            </el-table-column>
+            <el-table-column label="操作" width="228px">
+                <template slot-scope="scope">
+                    <el-button type="danger" v-on:click="delect(scope.row.pbc_id)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <br>
+        <br>
+    </div>
+    <script type="text/javascript">
+        var vm = new Vue({
+            el: "#app",
+            data: {
+                tableData: [],
+            },
+            methods: {
+                fill() {
+                    axios.get("/Cpchar/FindXC").then(res => {
+                        this.tableData = res.data;
+                    }).catch(err => {
+                        console.log(err);
+                    })
+                }, delect(row) {
+                    this.$confirm('确定删除此记录嘛?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        axios.get("/Cpchar/FindDelete", {
+                            params: {
+                                id: row
+                            }
+                        }).then(res => {
+                            if (res.data > 0) {
+                                this.$message({
+                                    type: 'success',
+                                    message: '删除成功!'
+                                });
+                            }
+                            this.fill();
+                        })
+                    }).catch(() => {
+                        this.$message({
+                            type: 'warning',
+                            message: '取消删除!'
+                        });
+                    })
+                },
+            }, mounted() {
+                this.fill();
+            }
+        })
+    </script>
+</body>
+</html>

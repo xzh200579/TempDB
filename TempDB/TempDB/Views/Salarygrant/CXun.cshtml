@@ -1,0 +1,126 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="../../css/table.css" type="text/css" />
+    <script type="text/javascript" src="../../javascript/jquery-1.7.2.js"></script>
+    <script src="~/Scripts/vue/dist/vue.js"></script>
+    <script src="~/Scripts/element-ui/lib/index.js"></script>
+    <link href="~/Scripts/element-ui/lib/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/axios/dist/axios.js"></script>
+</head>
+<body>
+    <div id="app">
+        <form method="post" action="">
+            <table width="100%">
+                <tr>
+                    <td>
+                        <font color="black">您正在做的业务是:人力资源管理--薪酬发放管理--薪酬发放查询</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        &nbsp;
+                    </td>
+                </tr>
+            </table>
+            <el-table :data="tableData"
+                      border
+                      style="width: 100%"
+                      :header-cell-style="{fontSize: '20px', height:'64px'}">
+                <el-table-column prop="salary_grant_id" label="薪酬标准编号" width="220">
+                    <template slot-scope="scope">
+                        <span v-on:click="handleColumnClick(scope.row)" style="color: #023B9D">{{ scope.row.salary_grant_id }}</span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column prop="first_kind_name"
+                                 label="I级机构名称"
+                                 width="300">
+                </el-table-column>
+                <el-table-column prop="second_kind_name"
+                                 label="II级机构名称"
+                                 width="300">
+                </el-table-column>
+                <el-table-column prop="third_kind_name"
+                                 label="III级机构名称"
+                                 width="300">
+                </el-table-column>
+                <el-table-column prop="human_amount"
+                                 label="人数"
+                                 width="230">
+                </el-table-column>
+                <el-table-column prop="salary_standard_sum"
+                                 label="基本薪酬总额(元)"
+                                 width="330">
+                </el-table-column>
+            </el-table>
+            <div align="center" style="font-size: 18px; color: gray; margin-top: 10px;" id="borther">
+                <el-pagination v-on:size-change="handleSizeChange"
+                               v-on:current-change="handleCurrentChange"
+                               :currentpage="currentPage"
+                               :page-sizes="[4, 8, 12, 16]"
+                               :page-size="pageSize"
+                               layout="total, sizes, prev, pager, next, jumper"
+                               :total="rows">
+                </el-pagination>
+            </div>
+        </form>
+</div>
+    <script type="text/javascript">
+        var vm = new Vue({
+            el: "#app",
+            data() {
+                return {
+                    tableData: [],//进行存储份分页数据
+                    pageSize: 4,//，每页显示的条数
+                    currentPage: 1,//当前页数
+                    rows: 1
+                }
+            },
+            methods: {
+                fill() {
+                    var whw =@Html.Raw(Json.Encode(ViewBag.s));
+                    axios("/Salarygrant/MoObscureTwo", {
+                        params: {
+                            pageSize: this.pageSize,
+                            currentPage: this.currentPage,
+                            condition: whw
+                        }
+                    }).then(res => {
+                            this.tableData = res.data.List;
+                            this.rows = res.data.Rows;
+                            console.log(res.data.List);
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        })
+                }, 
+                handleSizeChange: function (size) {
+                    this.pageSize = size;
+                    this.currentPage = 1;
+                    this.fill();
+                },
+                handleCurrentChange: function (cpage) {
+                    this.currentPage = cpage;
+                    this.fill();
+                },
+                ////进行显示
+                handleColumnClick(row) {
+                    console.log(row.salary_grant_id);
+                    location.href = "/Salarygrant/XSfa?id=" + row.salary_grant_id;
+                },
+            },
+            mounted: function () {
+                this.fill();
+            }
+
+        })
+    </script>
+</body>
+</html>
